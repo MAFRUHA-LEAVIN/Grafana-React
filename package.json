@@ -1,0 +1,30 @@
+{
+  "name": "grafana-tuni-project",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
+  },
+  "author": "Eetu Laukkanen, Mikael Arvaja, Sami Mononen, Mimmi Matalamäki, Tanmoy Murad, Rasmus Salla",
+  "devDependencies": {
+    "@grafana/data": "7.0.1",
+    "@grafana/toolkit": "7.0.1",
+    "@grafana/ui": "7.0.1",
+    "@grafana/runtime": "7.0.1",
+    "emotion": "10.0.27",
+    "eslint-plugin-react-hooks": "^4.1.2",
+    "jest": "^26.6.3",
+    "prettier": "2.1.2"
+  },
+  "engines": {
+    "node": ">=12 <13"
+  },
+  "dependencies": {
+    "@types/jest": "^26.0.15",
+    "d3": "^6.2.0",
+    "mpld3": "^0.5.1"
+  }
+}

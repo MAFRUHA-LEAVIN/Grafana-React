@@ -1,0 +1,76 @@
+# This workflow will do the following
+#   - clean install of node dependencies
+#   - build the source code 
+#   - run tests across different versions of node
+# For more information see: 
+#   https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: npm CI
+
+on:
+  push:
+    branches: [master, dev_general]
+  pull_request:
+    branches: [master]
+
+env:
+  build_ok: ':white_check_mark: Build'
+  build_fail: ':x: Build'
+  test_ok: ':white_check_mark: Tests'
+  test_fail: ':x: Tests'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:    
+    - uses: actions/checkout@v2
+    - name: Run npm with node-version 12
+      
+      # Grafana officially supports node version >= 12 < 13
+      uses: actions/setup-node@v2.1.2
+      with:
+        node-version: '12.x'
+
+    - run: npm ci
+
+    - run: npm run-script build --if-present
+      id: build
+
+    - run: npm test
+      id: test
+
+    - name: Get build outcome
+      uses: haya14busa/action-cond@v1
+      if: ${{ always() }}
+      id: build_message
+      with:
+        cond: ${{ steps.build.outcome == 'success' }}
+        if_true: ${{ env.build_ok }}
+        if_false: ${{ env.build_fail }}
+        
+    - name: Get test outcome
+      uses: haya14busa/action-cond@v1
+      if: ${{ always() }}
+      id: test_message
+      with:
+        cond: ${{ steps.test.outcome == 'success' }}
+        if_true: ${{ env.test_ok }}
+        if_false: ${{ env.test_fail }}
+    
+    - name: Discord notification
+      uses: Ilshidur/action-discord@0.3.0
+      if: ${{ always() }}
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        DISCORD_EMBEDS: '[{
+          "description": "
+            CI-pipeline for ${{ github.sha }}\n
+            on branch: ${{ github.ref }}\n
+            user: ${{ github.actor }}\n\n
+            ${{ steps.build_message.outputs.value }}\n\n
+            ${{ steps.test_message.outputs.value }}"
+          }
+        ]'
+        DISCORD_USERNAME: "CI-pipeline"
+        DISCORD_AVATAR: "https://avatars0.githubusercontent.com/u/44036562?s=200&v=4"
